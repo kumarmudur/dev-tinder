@@ -6,6 +6,10 @@ app.get('/', (req, res) => {
     res.send("Welcome nodejs");
 });
 
+app.get('/user', (req, res) => {
+   res.send({ firstName: 'Shiva', lastName: 'Mahesh' });
+});
+
 app.get('/hello', (req, res) => {
    res.send("Hello hello!");
 });
