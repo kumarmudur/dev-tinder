@@ -1,0 +1,15 @@
+{
+  "name": "dev-tinder-backend",
+  "version": "1.0.0",
+  "description": "tinder app for backend",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "NodeJS",
+    "Javascript"
+  ],
+  "author": "kumarmudur",
+  "license": "ISC"
+}
