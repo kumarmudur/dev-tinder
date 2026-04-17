@@ -6,9 +6,14 @@ app.get('/', (req, res) => {
     res.send("Welcome nodejs");
 });
 
-app.get('/user', (req, res) => {
-   res.send({ firstName: 'Shiva', lastName: 'Mahesh' });
-});
+app.use('/user', (req, res, next) => {
+    console.log('Handling Response 1');
+    next();
+},
+    (req, res) => {
+        console.log('Handling Response 2');
+        res.send(('2nd Response'));
+    });
 
 app.get('/hello', (req, res) => {
    res.send("Hello hello!");
