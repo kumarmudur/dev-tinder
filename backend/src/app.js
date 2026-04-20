@@ -6,15 +6,6 @@ const app = express();
 app.use(express.json());
 
 app.post('/signup', async (req, res) => {
-
-    console.log(req.body);
-    // const user = new User({
-    //     firstName: 'MS',
-    //     lastName: 'Dhoni',
-    //     emailId: 'msd@gmail.com',
-    //     password: 'msd@123',
-    // });
-    //
     const user = new User(req.body);
     try {
         await user.save();
@@ -22,8 +13,6 @@ app.post('/signup', async (req, res) => {
     } catch (err) {
         res.status(400).send('Error creating user' + err.message);
     }
-
-
 });
 
 connectDB().then(() => {
