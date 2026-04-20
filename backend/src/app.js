@@ -1,28 +1,32 @@
 const express = require('express');
+const connectDB = require("./config/database");
+const User = require("./models/user");
 
 const app = express();
 
-app.get('/', (req, res) => {
-    res.send("Welcome nodejs");
-});
-
-app.use('/user', (req, res, next) => {
-    console.log('Handling Response 1');
-    next();
-},
-    (req, res) => {
-        console.log('Handling Response 2');
-        res.send(('2nd Response'));
+app.post('/signup', async (req, res) => {
+    const user = new User({
+        firstName: 'Sachin',
+        lastName: 'Tendulkar',
+        emailId: 'sachin@tendulkar.com',
+        password: 'sachin@123',
     });
 
-app.get('/hello', (req, res) => {
-   res.send("Hello hello!");
+    try {
+        await user.save();
+        res.send('user added successfully.');
+    } catch (err) {
+        res.status(400).send('Error creating user' + err.message);
+    }
+
+
 });
 
-app.get('/test', (req, res)=> {
-   res.send('Hello from server');
-});
+connectDB().then(() => {
+    console.log("Connected to the database");
+    app.listen(8080, () => {
+        console.log('server is successfully listening on port 8080');
+    });
+}).catch(err => console.log('Database connection error:', err));
 
-app.listen(8080, () => {
-    console.log('server is successfully listening on port 8080');
-});
+
