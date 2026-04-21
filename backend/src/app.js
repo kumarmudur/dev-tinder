@@ -47,6 +47,41 @@ app.get('/feed', async (req, res) => {
     }
 });
 
+// delete user
+app.delete('/user', async (req, res) => {
+    const userId = req.body.userId;
+    try {
+        const user = await User.findByIdAndDelete(userId);
+        res.send('user removed successfully.'+ user);
+
+    } catch (error) {
+        res.status(404).send('Something went wrong' + error);
+    }
+});
+
+// update data of the user
+app.patch('/user/:userId', async (req, res) => {
+    const userId= req.params?.userId;
+    const data = req.body;
+    try {
+        const ALLOWED_UPDATES = ['photoUrl', 'about', 'gender', 'age', 'skills'];
+        const isUpdateAllowed = Object.keys(data).every((key) => ALLOWED_UPDATES.includes(key));
+        if (!isUpdateAllowed) {
+            throw new Error('Update not allowed.');
+        }
+        if (data?.skills?.length > 10) {
+            throw new Error('Skills must be less than 10 characters.');
+        }
+        await User.findByIdAndUpdate({ _id: userId}, data, {
+            returnDocument: 'after',
+            runValidators: true,
+        });
+        res.send('user updated successfully.');
+    } catch (error) {
+        res.status(404).send('Something went wrong ' + error.message);
+    }
+});
+
 connectDB().then(() => {
     console.log("Connected to the database");
     app.listen(8080, () => {
