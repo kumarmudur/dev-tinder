@@ -1,4 +1,7 @@
 const mongoose = require('mongoose');
+const validator = require("validator");
+const jwt = require('jsonwebtoken');
+const bcrypt = require("bcrypt");
 const { model, Schema  } = mongoose;
 
 const userSchema = new Schema({
@@ -17,10 +20,20 @@ const userSchema = new Schema({
         required: true,
         unique: true,
         trim: true,
+        validate(value) {
+            if(!validator.isEmail(value)) {
+                throw new Error("EmailId must be a valid email" + value);
+            }
+        }
     },
     password: {
         type: String,
         required: true,
+        validate(value) {
+            if(!validator.isStrongPassword(value)) {
+                throw new Error("Enter a strong password " + value);
+            }
+        }
     },
     age: {
         type: Number,
@@ -37,6 +50,11 @@ const userSchema = new Schema({
     photoUrl: {
         type: String,
         default: 'https://hostalitecloud.com/crb/wp-content/uploads/2025/10/dummy-user-male.jpg',
+        validate(value) {
+            if(!validator.isURL(value)) {
+                throw new Error("Invalid photo URL address" + value);
+            }
+        }
     },
     about: {
         type: String,
@@ -48,5 +66,20 @@ const userSchema = new Schema({
 }, {
     timestamps: true,
 });
+
+userSchema.methods.getJWT = async function () {
+    const user = this;
+    const token = await jwt.sign({ _id: user._id }, "DEV@Tinder$790", {
+        expiresIn: '7d'
+    });
+    return token;
+}
+
+userSchema.methods.validatePassword = async function (passwordInputByUser) {
+    const user = this;
+    const passwordHash = user.password;
+
+    return await bcrypt.compare(passwordInputByUser, passwordHash);
+}
 
 module.exports = model('User', userSchema);
