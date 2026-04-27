@@ -1,60 +1,24 @@
 const express = require('express');
-const bcrypt = require('bcrypt');
+const cookieParser = require('cookie-parser');
 const connectDB = require("./config/database");
 const User = require("./models/user");
-const { validateSignUpData } = require('./utils/validation');
 
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 
-app.post('/signup', async (req, res) => {
-    try {
-        // validation of data
-        validateSignUpData(req);
+const authRouter = require("./routes/auth");
+const profileRouter = require("./routes/profile");
+const requestRouter  = require("./routes/requests");
+const userRouter = require("./routes/user");
 
-        // encrypt the password
-        const { firstName, lastName, emailId, password } = req.body || {};
-
-        // Encrypt the password
-        const passwordHash= await bcrypt.hash(password, 10);
-
-        // creating a new instance of the user modal
-        const user = new User({
-            firstName,
-            lastName,
-            emailId,
-            password: passwordHash,
-        })
-        await user.save();
-        res.send('user added successfully.');
-    } catch (err) {
-        res.status(400).send('Error: ' + err.message);
-    }
-});
-
-app.post('/login', async (req, res) => {
-    try {
-        const { emailId, password } = req.body || {};
-
-        const user = await User.findOne({ emailId });
-        if (!user) {
-            res.status(401).send('Invalid credentials');
-        }
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-        if(isPasswordValid) {
-            res.status(200).send('Login successful!');
-        } else {
-            throw new Error('Invalid credentials');
-        }
-        console.log(isPasswordValid);
-
-    } catch (error) {
-        res.status(400).send('Error: ' + error.message);
-    }
-});
+app.use('/', authRouter);
+app.use('/', profileRouter);
+app.use('/', requestRouter);
+app.use('/', userRouter);
 
 // Get user by email
-app.get('/user', async (req, res) => {
+app.get('/user',  async (req, res) => {
    const userEmailId = req.body.emailId;
 
    try {
