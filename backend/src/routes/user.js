@@ -1,9 +1,10 @@
 const express = require('express');
+
 const { userAuth } = require("../middlewares/auth");
 const ConnectionRequest = require("../models/connectionRequest");
 const User = require("../models/user");
-const userRouter = express.Router();
 
+const userRouter = express.Router();
 const USER_SAFE_DATA = "firstName lastName photoUrl age gender about skills";
 
 // Get all the pending connection request for the loggedIn user
@@ -30,11 +31,9 @@ userRouter.get('/user/connections', userAuth, async (req, res) => {
         const connectionRequests = await ConnectionRequest.find({
            $or: [
                { toUserId: loggedInUser._id, status: "accepted" },
-               { fromUsedId: loggedInUser._id, status: "accepted" },
+               { fromUserId: loggedInUser._id, status: "accepted" },
            ]
-        })
-            .populate("fromUserId", USER_SAFE_DATA)
-            .populate('toUserId', USER_SAFE_DATA);
+        }).populate("fromUserId", USER_SAFE_DATA).populate('toUserId', USER_SAFE_DATA)
 
         const data = connectionRequests.map((row) => {
             if (row.fromUserId._id.toString() === loggedInUser._id.toString()) {
@@ -42,8 +41,7 @@ userRouter.get('/user/connections', userAuth, async (req, res) => {
             }
             return row.fromUserId;
         });
-
-        res.status(200).json({data });
+        res.status(200).json({ data });
     } catch (error) {
         res.status(400).send("Error " + error.message);
     }
@@ -69,10 +67,7 @@ userRouter.get('/feed', userAuth, async (req, res) => {
               { fromUserId: loggedInUser._id },
               { toUserId: loggedInUser._id },
           ]
-       })
-           .select("fromUserId toUserId")
-           .populate("fromUserId", "firstName")
-           .populate("toUserId", "firstName");
+       }).select("fromUserId toUserId");
 
        const hideUsersFromFeed = new Set();
        connectionRequests.forEach((request) => {
