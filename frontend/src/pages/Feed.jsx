@@ -21,7 +21,7 @@ const Feed = () => {
         } catch (error) {
             console.log(error);
         }
-    }
+    }₹
 
     useEffect(() => {
         getFeed();
@@ -39,3 +39,5 @@ const Feed = () => {
 };
 
 export default Feed;
+
+//PeppermintTwist
